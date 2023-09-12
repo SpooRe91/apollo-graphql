@@ -1,21 +1,18 @@
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
-
-
-const typeDefs = `#graphql
-type Book {
-    title: String
-    author: String
-  }
-
-  type Query {
-    books: [Book]
-  }
-`
+import { raids } from './utils/_db';
+import { typeDefs } from './utils/schema';
 
 const resolvers = {
     Query: {
-        books: () => books,
+        allRaids: () => raids,
+        raid: (_, args: any) => {
+            return raids.find((el) => el.id === args.id);
+        },
+        didFlawless: (_, args: any) => {
+            if (args.id > 7) { return Error("NO SUCH DATA") }
+            return raids.find((el) => el.id === args.id).flawless;
+        }
     },
 }
 
@@ -30,13 +27,3 @@ const { url } = await startStandaloneServer(server, {
 
 console.log(`Server ready at: ${url}`);
 
-const books = [
-    {
-        title: 'The Awakening',
-        author: 'Kate Chopin'
-    },
-    {
-        title: 'City of Glass',
-        author: 'Paul Auster'
-    }
-];
